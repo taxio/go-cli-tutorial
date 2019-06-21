@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/spf13/afero"
 	"github.com/taxio/go-cli-tutorial/cmd/dailyrepo-ex/cmd"
@@ -9,7 +10,9 @@ import (
 
 func main() {
 	fs := afero.NewOsFs()
-	if err := cmd.NewRootCmd(fs).Execute(); err != nil {
+	out := os.Stdout
+
+	if err := cmd.NewRootCmd(out, fs).Execute(); err != nil {
 		log.Fatal(err)
 	}
 }

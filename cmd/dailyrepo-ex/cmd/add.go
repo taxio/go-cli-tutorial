@@ -34,29 +34,6 @@ func NewAddCmd(fs afero.Fs) *cobra.Command {
 	return cmd
 }
 
-//var addCmd = &cobra.Command{
-//	Use:   "add",
-//	Short: "日報を生成",
-//	Long:  `今日の日付の日報を作成する`,
-//	RunE: func(cmd *cobra.Command, args []string) error {
-//		fileName, err := cmd.Flags().GetString("name")
-//		if err != nil {
-//			return err
-//		}
-//		err = generateReport(fileName)
-//		if err != nil {
-//			return err
-//		}
-//		return nil
-//	},
-//}
-//
-//func init() {
-//	rootCmd.AddCommand(addCmd)
-//
-//	addCmd.Flags().StringP("name", "n", time.Now().Format("2006-01-02")+".md", "report name")
-//}
-
 func generateReport(afs afero.Fs, filename string) error {
 	statikFs, err := fs.New()
 	if err != nil {
