@@ -1,50 +1,71 @@
-// Copyright © 2019 NAME HERE <EMAIL ADDRESS>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package cmd
 
 import (
-	"fmt"
+	"io/ioutil"
+	"os"
+	"text/template"
+	"time"
 
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
+	_ "github.com/taxio/go-cli-tutorial/statik"
 )
 
-// addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add called")
+	Short: "日報を生成",
+	Long:  `今日の日付の日報を作成する`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		fileName, err := cmd.Flags().GetString("name")
+		if err != nil {
+			return err
+		}
+		err = generateReport(fileName)
+		if err != nil {
+			return err
+		}
+		return nil
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(addCmd)
 
-	// Here you will define your flags and configuration settings.
+	addCmd.Flags().StringP("name", "n", time.Now().Format("2006-01-02")+".md", "report name")
+}
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
+func generateReport(filename string) error {
+	statikFs, err := fs.New()
+	if err != nil {
+		return err
+	}
+	// template読み込む
+	tplFile, err := statikFs.Open("/report.md.tmpl")
+	if err != nil {
+		return err
+	}
+	defer tplFile.Close()
+	btpl, err := ioutil.ReadAll(tplFile)
+	if err != nil {
+		return err
+	}
+	stpl := string(btpl)
+	tpl := template.Must(template.New("report").Parse(stpl))
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// Todayを差し込んでファイルに書き込む
+	rptFile, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	rptData := struct {
+		Today string
+	}{
+		Today: time.Now().Format("2006-01-02"),
+	}
+	err = tpl.Execute(rptFile, rptData)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
