@@ -8,6 +8,9 @@ import (
 	"log"
 	"os"
 	"time"
+
+	"github.com/rakyll/statik/fs"
+	_ "github.com/taxio/go-cli-tutorial/statik"
 )
 
 type RootOption struct {
@@ -75,8 +78,17 @@ func handleRootCmd(opt *RootOption) error {
 }
 
 func handleAddCmd(opt *AddOption) error {
+	statikFs, err := fs.New()
+	if err != nil {
+		return err
+	}
 	// template読み込む
-	btpl, err := ioutil.ReadFile("../../templates/report.md.tmpl")
+	tplFile, err := statikFs.Open("/report.md.tmpl")
+	if err != nil {
+		return err
+	}
+	defer tplFile.Close()
+	btpl, err := ioutil.ReadAll(tplFile)
 	if err != nil {
 		return err
 	}

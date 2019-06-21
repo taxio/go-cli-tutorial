@@ -6,5 +6,6 @@ package tools
 
 // tool dependencies
 import (
+	_ "github.com/rakyll/statik"
 	_ "github.com/spf13/cobra/cobra"
 )
