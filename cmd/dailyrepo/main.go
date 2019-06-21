@@ -24,7 +24,7 @@ type AddOption struct {
 
 func main() {
 	rootOpt := RootOption{}
-	rootCmd := flag.NewFlagSet("go-cli-standard root", flag.ContinueOnError)
+	rootCmd := flag.NewFlagSet("dailyrepo root", flag.ContinueOnError)
 	rootCmd.BoolVar(&rootOpt.flgVersion, "v", false, "print version(short)")
 	rootCmd.BoolVar(&rootOpt.flgVersion, "version", false, "print version")
 	rootCmd.BoolVar(&rootOpt.flgVerbose, "verbose", false, "print info log for developer")
