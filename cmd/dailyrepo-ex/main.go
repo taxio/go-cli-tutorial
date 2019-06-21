@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/spf13/afero"
@@ -13,6 +13,7 @@ func main() {
 	out := os.Stdout
 
 	if err := cmd.NewRootCmd(out, fs).Execute(); err != nil {
-		log.Fatal(err)
+		_, _ = fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
